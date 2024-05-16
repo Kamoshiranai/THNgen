@@ -153,9 +153,11 @@ def random_tensor_hyper_network( #LATER
     number_of_tensors: int,
     regularity: float,
     max_tensor_order: int = None,
-    max_edge_order: int = 2, #TODO add parameter to control whether to have diagonals in hyper edges
+    max_edge_order: int = 2,
+    diagonals_in_hyper_edges: bool = True, #TODO write test for this
     number_of_output_indices: int = 0,
     max_output_index_order: int = 1,
+    diagonals_in_output_indices: bool = True, #TODO write test for this
     number_of_self_edges: int = 0,
     max_self_edge_order: int = 2,
     number_of_single_summation_indices: int = 0,
@@ -180,11 +182,15 @@ def random_tensor_hyper_network( #LATER
         The maximum order (number of axes/dimensions) of the tensors. If ``None``, use an upper bound calculated from other parameters.
     max_edge_order: int, optional
         The maximum order of hyperedges.
+    diagonals_in_hyper_edges: bool = True,
+        Whether diagonals can appear in hyper edges, e.g. in "aab,ac,ad -> bcd" a is a hyper edge with a diagonal in the first tensor.
     number_of_output_indices : int, optional
         Number of output indices/axes (i.e. the number of non-contracted indices).
         Defaults to 0, i.e., a contraction resulting in a scalar.
     max_output_index_order: int = 1, optional
         Restricts the number of times the same output index can occur.
+    diagonals_in_output_indices: bool = True,
+        Whether diagonals can appear in output indices, e.g. in "aab,ac -> abc" a is an output index with a diagonal in the first tensor.
     number_of_self_edges: int = 0, optional
         The number of self edges/traces (e.g. in "ab,bcdd->ac" d represents a self edge).
     max_self_edge_order: int = 2, optional
@@ -261,20 +267,32 @@ def random_tensor_hyper_network( #LATER
         number_of_tensors_to_do = number_of_tensors - tensor_number
         available_spaces = number_of_spaces - number_of_reserved_spaces
         max_order = min(len(not_max_order_tensors), max_edge_order, number_of_connecting_indices_to_do - 2 * number_of_tensors_to_do, available_spaces) # we can only connect to existing tensors which do not have the max order, respect the max edge order, need to make sure we have enough indices left for the other tensors and need to respect the number of reserved/available spaces
-        order = rng.integers(2, max_order+1)
+        order = rng.integers(2, max_order + 1)
 
         # determine tensors to connect to
-        for index_number in range(order):
-            # fist connect to already existing tensors, then to new tensor
-            if index_number == 1:
-                tensors.append(index)
-                not_max_order_tensors.append(len(tensors) - 1)
-                continue
-            tensor = rng.choice(not_max_order_tensors) #NOTE: we can get diagonals over one tensor in a hyperedge
-            tensors[tensor] += index
-            # check if max order is reached
-            if len(tensors[tensor]) == max_tensor_order:
-                not_max_order_tensors.remove(tensor)
+        if diagonals_in_hyper_edges:
+            for index_number in range(order):
+                # fist connect to already existing tensors
+                if index_number == 1:
+                    tensors.append(index)
+                    not_max_order_tensors.append(len(tensors) - 1)
+                    continue
+                tensor = rng.choice(not_max_order_tensors) #NOTE: we can get diagonals over one tensor in a hyperedge
+                tensors[tensor] += index
+                # check if max order is reached
+                if len(tensors[tensor]) == max_tensor_order:
+                    not_max_order_tensors.remove(tensor)
+        else:
+            # connect to other tensors
+            connect_to_tensors = rng.choice(not_max_order_tensors, size = order - 1, replace = False, shuffle = False)
+            for tensor in connect_to_tensors:
+                tensors[tensor] += index
+                # check if max order is reached
+                if len(tensors[tensor]) == max_tensor_order:
+                    not_max_order_tensors.remove(tensor)
+            # connect to new tensor
+            tensors.append(index)
+            not_max_order_tensors.append(len(tensors) - 1)
         
         number_of_connecting_indices_to_do -= order
         number_of_reserved_spaces -= 2 # took care of one tensor
@@ -303,9 +321,17 @@ def random_tensor_hyper_network( #LATER
                 # check if max order is reached
                 if len(tensors[tensor]) == max_tensor_order:
                     not_max_order_tensors.remove(tensor)
-        else:
+        elif diagonals_in_hyper_edges:
             for _ in range(order):
                 tensor = rng.choice(not_max_order_tensors) #NOTE: we can get diagonals over one tensor in a hyperedge
+                tensors[tensor] += index
+                # check if max order is reached
+                if len(tensors[tensor]) == max_tensor_order:
+                    not_max_order_tensors.remove(tensor)
+        else:
+            # connect to tensors
+            connect_to_tensors = rng.choice(not_max_order_tensors, size = order, replace = False, shuffle = False)
+            for tensor in connect_to_tensors:
                 tensors[tensor] += index
                 # check if max order is reached
                 if len(tensors[tensor]) == max_tensor_order:
@@ -364,18 +390,26 @@ def random_tensor_hyper_network( #LATER
         # determine order of output index:
         number_of_output_indices_to_do = number_of_output_indices - output_index_number
         available_spaces = number_of_spaces - number_of_reserved_spaces
-        max_order = min(max_output_index_order, len(not_max_order_tensors) - number_of_output_indices_to_do, available_spaces) # respect max order of output index, number of output indices left to do and max order of tensors (available_spaces)
+        max_order = min(max_output_index_order, len(not_max_order_tensors), available_spaces) # respect max order of output index, max number of tensors to connect to and number of output indices left to do (available_spaces) #TODO could connect several times to same tensor from not_max_order_tensors, if diagonals are allowed in hyper edges -> keep track of spaces free in not_max_order_tensors?
         order = rng.integers(1, max_order + 1)
 
         # determine tensors to connect to
         output += index
-        for _ in range(order):
-            tensor = rng.choice(not_max_order_tensors) #NOTE:we can get diagonals over one tensor in an output index
-            tensors[tensor] += index
-            
-            # check if max order is reached
-            if len(tensors[tensor]) == max_tensor_order:
-                not_max_order_tensors.remove(tensor)
+        if diagonals_in_output_indices:
+            for _ in range(order):
+                tensor = rng.choice(not_max_order_tensors) #NOTE:we can get diagonals over one tensor in an output index
+                tensors[tensor] += index
+                
+                # check if max order is reached
+                if len(tensors[tensor]) == max_tensor_order:
+                    not_max_order_tensors.remove(tensor)
+        else:
+            connect_to_tensors = rng.choice(not_max_order_tensors, size = order, replace = False, shuffle = False)
+            for tensor in connect_to_tensors:
+                tensors[tensor] += index
+                # check if max order is reached
+                if len(tensors[tensor]) == max_tensor_order:
+                    not_max_order_tensors.remove(tensor)
 
         number_of_used_indices += 1
         number_of_reserved_spaces -= 1 # took care of one output index
