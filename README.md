@@ -1,6 +1,6 @@
 # Tensor Hyper Network generator
 Code to generate connected random Tensor Networks (TNs) and Tensor Hyper Networks (THNs). 
-The output is in the form of einsum expressions (see [this blog post](https://rockt.github.io/2018/04/30/einsum) for an introduction to einsum and [numpy's implementation](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html) of einsum, which is not the fastest but has a simple interface).
+The output is in the form of einsum expressions (see [this blog post](https://rockt.github.io/2018/04/30/einsum) for an introduction to einsum and [numpy's implementation](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html) of einsum, which has a simple interface).
 
 # Installation
 #TODO
