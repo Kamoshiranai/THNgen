@@ -14,7 +14,8 @@ einsum_string, shapes, size_dict = random_tensor_network(
     number_of_output_indices, 
     min_axis_size, 
     max_axis_size, 
-    return_size_dict=True,
+    return_size_dict = True,
+    global_dim = False,
     seed = 12345
 )
 
@@ -37,6 +38,7 @@ diagonals_in_output_indices = False
 number_of_self_edges = 4
 max_self_edge_order = 3
 number_of_single_summation_indices = 3
+global_dim = True
 min_axis_size = 2
 max_axis_size = 4
 
@@ -52,6 +54,7 @@ einsum_string, shapes, size_dict = random_tensor_hyper_network(
     number_of_self_edges, 
     max_self_edge_order, 
     number_of_single_summation_indices, 
+    global_dim,
     min_axis_size, 
     max_axis_size, 
     return_size_dict=True,
@@ -62,3 +65,5 @@ print("Generated Tensor Hyper Network:")
 print("einsum string: " + einsum_string)
 print("shapes: ", shapes)
 print("size_dict: ", size_dict)
+
+#TODO test with some random parameters
