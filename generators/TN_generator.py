@@ -48,7 +48,7 @@ def random_tensor_network(
     size_dict : dict[str, int]
         The dict of index sizes, only returned if ``return_size_dict=True``.
 
-    Examples
+    Example
     --------
     >>> eq, shapes, size_dict = random_tensor_network(
         number_of_tensors = 10, 
