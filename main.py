@@ -28,13 +28,13 @@ print("")
 # Tensor Hyper Network Expressions
 
 number_of_tensors = 10
-regularity = 2.5
-max_tensor_order = 5
-max_edge_order = 6
-diagonals_in_hyper_edges = False
+regularity = 3.0
+max_tensor_order = 10
+max_edge_order = 3
+diagonals_in_hyper_edges = True
 number_of_output_indices = 5
 max_output_index_order = 3
-diagonals_in_output_indices = False
+diagonals_in_output_indices = True
 number_of_self_edges = 4
 max_self_edge_order = 3
 number_of_single_summation_indices = 3

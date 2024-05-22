@@ -57,23 +57,35 @@ def random_tensor_network(
     size_dict : dict[str, int]
         The dict of index sizes, only returned if ``return_size_dict=True``.
 
-    Examples #TODO
+    Examples
     --------
-    >>> eq, shapes = rand_equation(n=10, reg=4, number_of_output_indices=5, seed=42)
+    >>> eq, shapes, size_dict = random_tensor_network(
+        number_of_tensors = 10, 
+        regularity = 3.5, 
+        number_of_output_indices = 5, 
+        min_axis_size = 2, 
+        max_axis_size = 4, 
+        return_size_dict = True, 
+        global_dim = False, 
+        seed = 12345
+    )
+
     >>> eq
-    'oyeqn,tmaq,skpo,vg,hxui,n,fwxmr,hitplcj,kudlgfv,rywjsb->cebda'
+    'gafoj,mpab,uhlbcdn,cqlipe,drstk,ve,fk,ongmq,hj,i->sturv'
 
     >>> shapes
-    [(9, 5, 4, 5, 4),
-     (4, 4, 8, 5),
-     (9, 4, 6, 9),
-     (6, 6),
-     (6, 9, 7, 8),
-     (4,),
-     (9, 3, 9, 4, 9),
-     (6, 8, 4, 6, 8, 6, 3),
-     (4, 7, 8, 8, 6, 9, 6),
-     (9, 5, 3, 3, 9, 5)]
+    [(3, 4, 4, 2, 3), 
+    (3, 2, 4, 2), 
+    (4, 4, 2, 2, 4, 2, 3), 
+    (4, 2, 2, 4, 2, 2), 
+    (2, 4, 3, 4, 4), 
+    (2, 2), (4, 4), 
+    (2, 3, 3, 3, 2), 
+    (4, 3), 
+    (4,)]
+
+    >>> size_dict
+    {'a': 4, 'b': 2, 'c': 4, 'd': 2, 'e': 2, 'f': 4, 'g': 3, 'h': 4, 'i': 4, 'j': 3, 'k': 4, 'l': 2, 'm': 3, 'n': 3, 'o': 2, 'p': 2, 'q': 2, 'r': 4, 's': 3, 't': 4, 'u': 4, 'v': 2}
     """
 
     # handle inputs
@@ -165,10 +177,10 @@ def random_tensor_hyper_network(
     regularity: float,
     max_tensor_order: int = None,
     max_edge_order: int = 2,
-    diagonals_in_hyper_edges: bool = True,
+    diagonals_in_hyper_edges: bool = False,
     number_of_output_indices: int = 0,
     max_output_index_order: int = 1,
-    diagonals_in_output_indices: bool = True,
+    diagonals_in_output_indices: bool = False,
     number_of_self_edges: int = 0,
     max_self_edge_order: int = 2,
     number_of_single_summation_indices: int = 0,
@@ -192,14 +204,14 @@ def random_tensor_hyper_network(
         The maximum order (number of axes/dimensions) of the tensors. If ``None``, use an upper bound calculated from other parameters.
     max_edge_order: int, optional
         The maximum order of hyperedges.
-    diagonals_in_hyper_edges: bool = True,
+    diagonals_in_hyper_edges: bool = False,
         Whether diagonals can appear in hyper edges, e.g. in "aab,ac,ad -> bcd" a is a hyper edge with a diagonal in the first tensor.
     number_of_output_indices : int, optional
         Number of output indices/axes (i.e. the number of non-contracted indices) including global dimensions.
         Defaults to 0 if global_dim = False, i.e., a contraction resulting in a scalar, and to 1 if global_dim = True.
     max_output_index_order: int = 1, optional
         Restricts the number of times the same output index can occur.
-    diagonals_in_output_indices: bool = True,
+    diagonals_in_output_indices: bool = False,
         Whether diagonals can appear in output indices, e.g. in "aab,ac -> abc" a is an output index with a diagonal in the first tensor.
     number_of_self_edges: int = 0, optional
         The number of self edges/traces (e.g. in "ab,bcdd->ac" d represents a self edge).
@@ -227,17 +239,104 @@ def random_tensor_hyper_network(
     size_dict : dict[str, int]
         The dict of index sizes, only returned if ``return_size_dict=True``.
 
-    Example #TODO
+    Examples
     --------
-    >>> eq, shapes = rand_equation_hyper(number_of_tensors=10, regularity=3, max_tensor_order=8, max_edge_order=4, number_of_output_indices=5, max_output_index_order=3, min_axis_size=2, max_axis_size=5, connected = True)
+    'usual' Tensor Hyper Networks
+    >>> eq, shapes, size_dict = random_tensor_hyper_network(
+        number_of_tensors = 10
+        regularity = 2.5
+        max_tensor_order = 10
+        max_edge_order = 5
+        number_of_output_indices = 5
+        min_axis_size = 2
+        max_axis_size = 4
+        return_size_dict = True,
+        seed = 12345
+    )
     >>> eq
-    'a,jha,ia,ndeb,dlic,d,mbc,iim,bmhlkfj,hg->bcdea'
+    'bdca,abhcdg,cbmd,cfd,ed,e,figj,gl,h,nik->jnmkl'
 
     >>> shapes
-    [(4,), (5, 3, 4), (5, 4), (5, 3, 3, 3), (3, 3, 5, 4), (3,), (2, 3, 4), (5, 5, 2), (3, 2, 3, 3, 4, 4, 5), (3, 5)]
+    [(2, 2, 2, 2), 
+    (2, 2, 4, 2, 2, 3), 
+    (2, 2, 4, 2), 
+    (2, 2, 2), 
+    (2, 2), 
+    (2,), 
+    (2, 4, 3, 3), 
+    (3, 2), 
+    (4,), 
+    (3, 4, 3)]
+
+    >>> size_dict
+    {'a': 2, 'b': 2, 'c': 2, 'd': 2, 'e': 2, 'f': 2, 'g': 3, 'h': 4, 'i': 4, 'j': 3, 'k': 3, 'l': 2, 'm': 4, 'n': 3}
+
+    Tensor Hyper Networks with self edges (of higher order), single summation indices, output indices of higher order and a global dimension
+    >>> eq, shapes = random_tensor_hyper_network(
+        number_of_tensors = 10, 
+        regularity = 2.5, 
+        max_tensor_order = 5, 
+        max_edge_order = 6,
+        number_of_output_indices = 5, 
+        max_output_index_order = 3,
+        number_of_self_edges = 4, 
+        max_self_edge_order = 3, 
+        number_of_single_summation_indices = 3, 
+        global_dim = True,
+        min_axis_size = 2, 
+        max_axis_size = 4,
+        seed = 12345
+    )
+    >>> eq
+    'caxpp,afxeb,nbkxn,jdkxc,tdqxv,hxgre,jlxfi,xsgmm,howxo,xuijl->utvwx'
+
+    >>> shapes
+    [(2, 4, 4, 3, 3), 
+    (4, 3, 4, 3, 3), 
+    (3, 3, 2, 4, 3), 
+    (2, 2, 2, 4, 2), 
+    (2, 2, 2, 4, 3), 
+    (4, 4, 2, 3, 3), 
+    (2, 2, 4, 3, 3), 
+    (4, 3, 2, 3, 3), 
+    (4, 2, 2, 4, 2), 
+    (4, 2, 3, 2, 2)]
+
+    Tensor Hyper Networks as above but with diagonals in hyper edges and output indices
+    >>> eq, shapes = random_tensor_hyper_network(
+        number_of_tensors = 10, 
+        regularity = 3.0, 
+        max_tensor_order = 10, 
+        max_edge_order = 3,
+        diagonals_in_hyper_edges = True,
+        number_of_output_indices = 5, 
+        max_output_index_order = 3,
+        diagonals_in_output_indices = True, 
+        number_of_self_edges = 4, 
+        max_self_edge_order = 3, 
+        number_of_single_summation_indices = 3, 
+        global_dim = True,
+        min_axis_size = 2, 
+        max_axis_size = 4, 
+        seed = 12345
+    )
+    >>> eq
+    'cabxk,gkegax,wldxbrb,ctoxdfo,xvdlv,weehx,nfnkx,spgpixqu,xjimhm,ijx->uvwtx'
+
+    >>> shapes
+    [(3, 2, 4, 3, 2), 
+    (2, 2, 3, 2, 2, 3), 
+    (4, 4, 3, 3, 4, 3, 4), 
+    (3, 4, 3, 3, 3, 3, 3), 
+    (3, 3, 3, 4, 3), 
+    (4, 3, 3, 2, 3), 
+    (4, 3, 4, 2, 3), 
+    (3, 3, 2, 3, 2, 3, 2, 2), 
+    (3, 4, 2, 2, 2, 2), 
+    (2, 4, 3)]
     """
 
-    #TODO handle inputs
+    # handle inputs
     assert number_of_tensors >= 0, f"number_of_tensors {number_of_tensors} has to be non-negative."
     assert regularity >= 0, f"regularity {regularity} has to be non-negative."
     assert max_tensor_order >= 0, f"max_tensor_order {max_tensor_order} has to be non-negative."
@@ -259,7 +358,7 @@ def random_tensor_hyper_network(
     max_tensor_order -= 1 * global_dim # reserve one spot for global dim in every tensor 
 
     # check if max_tensor_order suffices to fit all connecting edge, output indices, self edges and single summation indices
-    assert max_tensor_order * number_of_tensors >= int(regularity * number_of_tensors) + number_of_output_indices + number_of_self_edges * 2 + number_of_single_summation_indices, f"the max_tensor_order*number_of_tensors =  {max_tensor_order * number_of_tensors} is not high enough to fit all {int(regularity*number_of_tensors)} connecting indices, {number_of_output_indices} output_indices, {2 * number_of_self_edges} indices of self_edges and {number_of_single_summation_indices} single summation indices." 
+    assert max_tensor_order * number_of_tensors >= int(regularity * number_of_tensors) + number_of_output_indices + number_of_self_edges * 2 + number_of_single_summation_indices, f"the (max_tensor_order - 1 * global_dim) * number_of_tensors =  {max_tensor_order * number_of_tensors} is not high enough to fit all {int(regularity*number_of_tensors)} connecting indices, {number_of_output_indices} output_indices, {2 * number_of_self_edges} indices of self_edges and {number_of_single_summation_indices} single summation indices." 
 
     # create rng
     if seed is None:
@@ -488,8 +587,6 @@ def random_tensor_hyper_network(
     # check length of output and that all specifications are fulfilled
     #assert number_of_reserved_spaces == 0, f"{number_of_reserved_spaces} spaces are still reserved."
     assert len(output) == (number_of_output_indices + 1 * global_dim)
-
-    #TODO add tests to check specifications
 
     # randomly shuffle outputs and tensors
     output = "".join(rng.permutation(list(output)))
