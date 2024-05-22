@@ -1,4 +1,5 @@
-from generators import random_tensor_network, random_tensor_hyper_network
+from generators.TN_generator import random_tensor_network
+from generators.THN_generator import random_tensor_hyper_network
 
 # Tensor Network Expressions
 
