@@ -1,6 +1,6 @@
 from typing import Union, Optional, Tuple, Dict, Collection
 from numpy.random import default_rng
-from opt_einsum.paths import _find_disconnected_subgraphs #NOTE: only for testing
+#from opt_einsum.paths import _find_disconnected_subgraphs #NOTE: only for testing
 
 from generators.util import get_symbol
 
@@ -427,7 +427,7 @@ def random_tensor_hyper_network(
     output = "".join(rng.permutation(list(output)))
 
     # Test if hypergraph is connected #NOTE connected in opt einsum sense means shared output indices is not a connection. In the sense of cotengra's Hypergraph this would be a connection.
-    assert len(_find_disconnected_subgraphs([set(input) for input in tensors], set(output))) == 1, f"the generated hypergraph has {len(_find_disconnected_subgraphs([set(input) for input in tensors], set(output)))} components." #TODO comment out later
+    # assert len(_find_disconnected_subgraphs([set(input) for input in tensors], set(output))) == 1, f"the generated hypergraph has {len(_find_disconnected_subgraphs([set(input) for input in tensors], set(output)))} components." #TODO comment out later
 
     tensors = ["".join(rng.permutation(list(input))) for input in tensors]
     # form equation
