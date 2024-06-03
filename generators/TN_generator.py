@@ -1,6 +1,6 @@
 from typing import Union, Optional, Tuple, Dict, Collection
 from numpy.random import default_rng
-from opt_einsum.paths import _find_disconnected_subgraphs #NOTE: only for testing
+#from opt_einsum.paths import _find_disconnected_subgraphs #NOTE: only for testing
 
 from generators.util import get_symbol
 
