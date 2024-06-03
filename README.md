@@ -3,8 +3,10 @@ Code to generate connected random Tensor Networks (TNs) and Tensor Hyper Network
 The output is in the form of einsum expressions (see [this blog post](https://rockt.github.io/2018/04/30/einsum) for an introduction to einsum and [numpy's implementation](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html) of einsum, which has a simple interface).
 
 # Installation
-The only package necessary to run this code is numpy >= 1.17.0. It can be installed with e.g.  
+The only package necessary to run this code is numpy >= 1.17.0. To install numpy with conda/mamba and run the code use:    
 conda create -n THNgen python numpy  
+conda activate THNgen  
+python main.py  
 If you are using an older numpy version you will have to change the random number generation, the rest should still work.  
   
 # Usage
